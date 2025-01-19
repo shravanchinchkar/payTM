@@ -1,5 +1,5 @@
 const express = require("express");
-const { User } = require("../db/database");
+const { User, Account } = require("../db/database");
 const zod = require("zod");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../config");
@@ -42,6 +42,35 @@ router.post("/signup", async (req, res) => {
 
   //if not create the following User
   const dbUser = await User.create(body);
+  if(dbUser){
+    res.status(200).json({
+        message:"user created successfully!"
+    })
+  }else if(!dbUser){
+    res.status(500).json({
+        message:"Something went wrong while creating a user!"
+    })
+
+  }
+
+  //gets the userId to create a bankAccount for that specific user
+  const userId=dbUser._id;
+
+  const userAccount=await Account.create({
+    userId,
+    balance: 1+ Math.random() *10000,
+  })
+
+  
+  if(userAccount){
+    res.status(200).json({
+        message:"Account created successfully!"
+    })
+  }else if(!userAccount){
+    res.status(500).json({
+        message:"Something went wrong while creating user bankAccount!"
+    })
+  }
 
   //Encode the username using jwt
   const token = jwt.sign(
