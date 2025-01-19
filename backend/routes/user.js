@@ -3,6 +3,7 @@ const { User } = require("../db/database");
 const zod = require("zod");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../config");
+const {authMiddleware}=require("../middleware")
 
 const router = express.Router();
 
@@ -101,5 +102,59 @@ router.post("/signin", async (req, res) => {
     });
   }
 });
+
+//zod schema for updating the user details
+const updateBody=zod.object({
+    firstName:zod.string().optional(), //here optional means the body may contain firstName or lastName or password or everything
+    lastName:zod.string().optional(),
+    password:zod.string().optional()
+})
+
+//following is the route to update firstName,lastName and password 
+router.put("/",authMiddleware,async(req,res)=>{
+    const body=req.body;
+    const {success}=updateBody.safeParse(body);
+    if(!success){
+        res.status(411).json({
+            message: "Error while updating information"
+        })
+    }
+    await User.updateOne({
+        _id:req.userId
+    },body)
+
+    return req.json({
+        message:"Updated successfully"
+    })
+})
+
+
+router.get("/bulk",async(req,res)=>{
+    const filter=req.params.filter || "";
+
+    //folllowing code says that if the substring present in the filter variable matches with either firstname or lastname return the user
+    const users=User.findOne({
+        $or:[{
+            firstName:{
+                "$regex":filter
+            }
+        },{
+            lastName:{
+                "$regex":filter
+            }
+        }]
+    })
+
+    res.json({
+        user:users.map((user)=>({
+            username:user.username,
+            firstName:user.firstName,
+            lastName:user.lastName,
+            _id:user._id
+        }))
+    })
+
+})
+
 
 module.exports = router;
