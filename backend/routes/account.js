@@ -2,6 +2,7 @@ const express=require("express");
 const {authMiddleware}=require("../middleware");
 const { Account } = require("../db/database");
 const { default: mongoose } = require("mongoose");
+const zod=require("zod");
 
 const router=express.Router();
 
@@ -15,11 +16,23 @@ router.get("/balance",authMiddleware,async(req,res)=>{
     })
 })
 
+const transactionSchema=zod.object({
+    to:zod.string(),
+    amount:zod.number()
+})
+
 //following route is used to tranfer money
 router.post("/transfer",authMiddleware,async(req,res)=>{
     const session=await mongoose.startSession();
 
     session.startTransaction();
+    const body=req.body;
+    const {success}=transactionSchema.safeParse(body)
+    if(!success){
+        return res.status(403).json({
+            message:"Invalid Input!"
+        })
+    }
     const to=req.body.to;
     const amount=req.body.amount;
 
