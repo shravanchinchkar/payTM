@@ -4,7 +4,7 @@ mongoose.connect("mongodb+srv://shravanchinchkar:Shravan%40132610@shrav.wg75m.mo
 
 //following is the schema for the User table
 const userSchema=mongoose.Schema({
-    userName:String,
+    username:String,
     password:String,
     firstName:String,
     lastName:String

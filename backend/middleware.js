@@ -5,14 +5,14 @@ function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization; //get the token from the user
 
   //if authHeader is invalid return a error message
-  if (!authHeader || !authHeader.startWith("Bearer")) {
+  if (!authHeader || !authHeader.startsWith("Bearer")) {
     return res.status(403).json({
       message: "Invalid input!",
     });
   }
 
   //if token is valid execute the following code
-  const token = authHeader.split("")[1];
+  const token = authHeader.split(' ')[1];
 
   try {
     const decode = jwt.decode(token, JWT_SECRET);
