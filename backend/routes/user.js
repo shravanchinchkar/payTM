@@ -46,11 +46,7 @@ router.post("/signup", async (req, res) => {
   //if not create the following User
   const dbUser = await User.create(body);
 
-  if (dbUser) {
-    res.status(200).json({
-      message: "user created successfully in Database!",
-    });
-  } else if (!dbUser) {
+  if (!dbUser) {
     res.status(500).json({
       message: "Something went wrong while creating a user!",
     });
@@ -64,11 +60,7 @@ router.post("/signup", async (req, res) => {
     balance: 1 + Math.random() * 10000,
   });
 
-  if (userAccount) {
-    res.status(200).json({
-      message: "Account created successfully!",
-    });
-  } else if (!userAccount) {
+  if (!userAccount) {
     res.status(500).json({
       message: "Something went wrong while creating user bankAccount!",
     });
