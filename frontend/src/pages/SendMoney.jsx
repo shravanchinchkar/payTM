@@ -21,7 +21,7 @@ export function SendMoney() {
                 </div>
             </div>
             <div>
-                <input type="text" placeholder="Enter amount" className="border-[2px] rounded-md p-[0.2rem] w-[380px] outline-none" />
+                <input type="number" placeholder="Enter amount" className="border-[2px] rounded-md p-[0.2rem] w-[380px] outline-none" />
             </div>
             <div>
             <button type="button" className="w-[380px] text-white bg-orange-500 hover:bg-orange-700   font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ">Initiate Transfer</button>

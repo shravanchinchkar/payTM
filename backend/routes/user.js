@@ -153,9 +153,8 @@ router.put("/", authMiddleware, async (req, res) => {
 
 //gets the users from backend
 router.get("/bulk", async (req, res) => {
-  const filter = req.query.filter || "";
+  const filter = (req.query.filter).charAt(0).toUpperCase() + (req.query.filter).slice(1) || "";
 
-  console.log("filter is:", filter);
 
   //folllowing code says that if the substring present in the filter variable matches with either firstname or lastname return the user
   const filterUsers = await User.find({
