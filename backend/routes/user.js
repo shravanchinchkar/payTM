@@ -101,9 +101,10 @@ router.post("/signin", async (req, res) => {
 
   //if inputs are incorrect return the error message
   if (!success) {
-    return res.status(411).json({
+    res.json({
       message: "Incorrect inputs",
     });
+    return
   }
 
   //if correct check whether the user exists in the db
@@ -124,11 +125,16 @@ router.post("/signin", async (req, res) => {
       token: token,
     });
     return;
+  }else{
+    // return res.status(411).json({
+    //   message: "Error while logging in",
+    // });
+    res.json({
+      message:"Error while logging in"
+    })
+    return;
   }
-
-  res.status(411).json({
-    message: "Error while logging in",
-  });
+  
 });
 
 //following is the route to update firstName,lastName and password
@@ -157,7 +163,6 @@ router.get("/bulk", async (req, res) => {
   const filter =req.query.filter || "";
   const finalFilter=filter.charAt(0).toUpperCase() +filter.slice(1)
 
-  console.log("Final Filter:",finalFilter)
 
 
   //folllowing code says that if the substring present in the filter variable matches with either firstname or lastname return the user
@@ -175,8 +180,6 @@ router.get("/bulk", async (req, res) => {
       },
     ],
   });
-
-  console.log("filtered data is:", filterUsers);
   res.json({
     user: filterUsers.map((user) => ({
       username: user.username,

@@ -69,7 +69,6 @@ export function Signup() {
               localStorage.setItem("token",response.data.token);
               alert("SignUp Successful!")
               navigate("/dashboard")
-
             }}
             buttonText={"Sign Up"}
           />

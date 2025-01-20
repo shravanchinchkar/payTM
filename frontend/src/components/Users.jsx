@@ -17,8 +17,6 @@ export function Users() {
     })
   },[filter])
 
-  console.log("user is:",user)
-
   return (
     <div className="m-[1rem] flex flex-col gap-[1rem]">
       <div className="font-bold text-xl">Users</div>
@@ -32,7 +30,7 @@ export function Users() {
       </div>
 
       {user.map((user)=>{
-        return(<div className="flex justify-between mt-[1rem] w-[95vw]">
+        return(<div className="flex justify-between mt-[1rem] w-[95vw]" key={user._id}>
           <div className="flex gap-[10px]">
             <Avatar initialLetter={user.firstName.charAt(0).toUpperCase()} />
             <div className="flex justify-center items-center font-bold text-xl">
