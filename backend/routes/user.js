@@ -4,8 +4,9 @@ const zod = require("zod");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../config");
 const { authMiddleware } = require("../middleware");
-
 const router = express.Router();
+
+//following are the zod schema which are equired
 
 //zod schema for validating signup route
 const signupSchema = zod.object({
@@ -13,6 +14,19 @@ const signupSchema = zod.object({
   password: zod.string(),
   firstName: zod.string(),
   lastName: zod.string(),
+});
+
+//zod schema for validating signin route
+const signinSchema = zod.object({
+  username: zod.string().email(),
+  password: zod.string(),
+});
+
+//zod schema for updating the user details
+const updateBody = zod.object({
+  firstName: zod.string().optional(), //here optional means the body may contain firstName or lastName or password or everything
+  lastName: zod.string().optional(),
+  password: zod.string().optional(),
 });
 
 //following is the signup route
@@ -80,13 +94,7 @@ router.post("/signup", async (req, res) => {
   });
 });
 
-//zod schema for signin route
-const signinSchema = zod.object({
-  username: zod.string().email(),
-  password: zod.string(),
-});
-
-//following is the route for signin
+//following is signin route
 router.post("/signin", async (req, res) => {
   const body = req.body; //take the login info. from the user
   const { success } = signinSchema.safeParse(body); //validate the user input
@@ -123,13 +131,6 @@ router.post("/signin", async (req, res) => {
   });
 });
 
-//zod schema for updating the user details
-const updateBody = zod.object({
-  firstName: zod.string().optional(), //here optional means the body may contain firstName or lastName or password or everything
-  lastName: zod.string().optional(),
-  password: zod.string().optional(),
-});
-
 //following is the route to update firstName,lastName and password
 router.put("/", authMiddleware, async (req, res) => {
   const body = req.body;
@@ -153,7 +154,10 @@ router.put("/", authMiddleware, async (req, res) => {
 
 //gets the users from backend
 router.get("/bulk", async (req, res) => {
-  const filter = (req.query.filter).charAt(0).toUpperCase() + (req.query.filter).slice(1) || "";
+  const filter =req.query.filter || "";
+  const finalFilter=filter.charAt(0).toUpperCase() +filter.slice(1)
+
+  console.log("Final Filter:",finalFilter)
 
 
   //folllowing code says that if the substring present in the filter variable matches with either firstname or lastname return the user
@@ -161,12 +165,12 @@ router.get("/bulk", async (req, res) => {
     $or: [
       {
         firstName: {
-          $regex: filter,
+          $regex: finalFilter,
         },
       },
       {
         lastName: {
-          $regex: filter,
+          $regex: finalFilter,
         },
       },
     ],

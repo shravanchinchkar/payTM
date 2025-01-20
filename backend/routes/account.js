@@ -26,20 +26,26 @@ router.post("/transfer",authMiddleware,async(req,res)=>{
     const session=await mongoose.startSession();
 
     session.startTransaction();
-    const body=req.body;
-    const {success}=transactionSchema.safeParse(body)
+    const receviersId=req.body.to;
+    const amountToBeSend=parseInt(req.body.amount);
+
+    const filteredBody={
+        to:receviersId,
+        amount:amountToBeSend
+    }
+    const {success}=transactionSchema.safeParse(filteredBody)
+
     if(!success){
         return res.status(403).json({
             message:"Invalid Input!"
         })
     }
-    const to=req.body.to;
-    const amount=req.body.amount;
+    const to=receviersId;
+    const amount=amountToBeSend;
 
-    console.log("To:",req.body.to);
-    console.log("amount to send:",req.body.amount);
-
-    console.log("user id:",req.userId)
+    console.log("User id of the person to whom the amount needs to be send:",req.body.to);
+    console.log("Amount that need to be send:",req.body.amount);
+    console.log("UserId of the sender who is going to send the money:",req.userId)
 
     //fetch the data of the sender how will send the money
     const account=await Account.findOne({

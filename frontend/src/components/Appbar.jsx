@@ -7,7 +7,7 @@ export function Appbar({firstName,initialLetter}){
             <div className="font-bold text-[30px]">
                 Payments App
             </div>
-            <div className="flex gap-[10px]">
+            <div className="flex gap-[10px] mr-[1rem]">
                 <div className="font-semibold text-[20px] p-[0.2rem] flex justify-center items-center">
                 Hello, {firstName}
                 </div>
