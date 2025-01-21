@@ -194,9 +194,13 @@ router.get("/loginuser",authMiddleware,async(req,res)=>{
   const requiredUser=await User.findOne({
     _id:userId
   })
-
+  const requireBalance=await Account.findOne({
+    userId:userId
+  })
+  
   res.json({
-    user:requiredUser
+    user:requiredUser,
+    balance:requireBalance
   })
   return;
 })

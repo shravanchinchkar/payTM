@@ -57,8 +57,11 @@ export function Signin() {
                 console.log("token from BE is:",response.data.token)
                 localStorage.setItem("token", response.data.token);
                 setIsAuth(true);
-                // navigate("/dashboard");
-                // alert("Signin Successful!");
+                navigate("/dashboard",{
+                  
+                });
+                alert("Signin Successful!");
+                navigate("/dashboard")
               } else if (response.data.message === "Error while logging in") {
                 localStorage.clear();
                 alert("User dose not exists!");

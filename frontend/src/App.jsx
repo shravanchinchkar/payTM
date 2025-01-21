@@ -7,10 +7,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil";
 import { isAuthenticated } from "./store/atoms/isAuth";
+import { PrivateRouter } from "./components/auth/PrivateRouter";
 
 function App() {
-  const[isAuth,setIsAuth]=useRecoilState(isAuthenticated);
-  console.log("Value of isAuth is:",isAuth)
+  const [isAuth, setIsAuth] = useRecoilState(isAuthenticated);
+  console.log("Value of isAuth is:", isAuth);
 
   async function sendToken() {
     console.log("Hello sendToken");
@@ -42,10 +43,7 @@ function App() {
       <RecoilRoot>
         <BrowserRouter>
           <Routes>
-            <Route
-              path="/"
-              element={isAuth ? <Dashboard /> : <Signin />}
-            />
+            <Route path="/" element={isAuth ? <Dashboard /> : <Signin />} />
             <Route
               path="/signup"
               element={isAuth ? <Dashboard /> : <Signup />}
@@ -56,9 +54,18 @@ function App() {
             />
             <Route
               path="/dashboard"
-              element={isAuth?<Dashboard/>:<Signin/>}
+              element={
+                <PrivateRouter>
+                  <Dashboard />
+                </PrivateRouter>
+              }
             />
-            <Route path="/send" element={<SendMoney />} />
+            <Route
+              path="/send"
+              element={
+                <SendMoney/>
+              }
+            />
           </Routes>
         </BrowserRouter>
       </RecoilRoot>
