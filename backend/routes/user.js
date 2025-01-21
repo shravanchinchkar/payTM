@@ -97,6 +97,7 @@ router.post("/signup", async (req, res) => {
 //following is signin route
 router.post("/signin", async (req, res) => {
   const body = req.body; //take the login info. from the user
+  console.log("bpdy is")
   const { success } = signinSchema.safeParse(body); //validate the user input
 
   //if inputs are incorrect return the error message
@@ -163,8 +164,6 @@ router.get("/bulk", async (req, res) => {
   const filter =req.query.filter || "";
   const finalFilter=filter.charAt(0).toUpperCase() +filter.slice(1)
 
-
-
   //folllowing code says that if the substring present in the filter variable matches with either firstname or lastname return the user
   const filterUsers = await User.find({
     $or: [
@@ -189,5 +188,17 @@ router.get("/bulk", async (req, res) => {
     })),
   });
 });
+
+router.get("/loginuser",authMiddleware,async(req,res)=>{
+  const userId=req.userId;
+  const requiredUser=await User.findOne({
+    _id:userId
+  })
+
+  res.json({
+    user:requiredUser
+  })
+  return;
+})
 
 module.exports = router;

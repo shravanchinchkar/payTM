@@ -1,42 +1,69 @@
-
-import{BrowserRouter,Route,Routes, useNavigate} from "react-router-dom";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import { Signup } from "./pages/Signup";
 import { Signin } from "./pages/Signin";
 import { Dashboard } from "./pages/Dashboard";
 import { SendMoney } from "./pages/SendMoney";
 import { useEffect, useState } from "react";
-
 import axios from "axios";
+import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil";
+import { isAuthenticated } from "./store/atoms/isAuth";
 
 function App() {
-  const [isAuthenticated,setIsAuthenticated]=useState(false)
-  // const navigate=useNavigate();
+  const[isAuth,setIsAuth]=useRecoilState(isAuthenticated);
+  console.log("Value of isAuth is:",isAuth)
 
   async function sendToken() {
-    const token= localStorage.getItem("token")
-    const response=await axios.post("http://localhost:3000/me",{
-      token:token
-    })
-    setIsAuthenticated(response.data.isAuth)
-    console.log("Backend response:",response.data.isAuth) 
+    console.log("Hello sendToken");
+    const token = localStorage.getItem("token");
+    console.log("localstorage token is:", token);
+
+    const response = await axios.post("http://localhost:3000/me", {
+      token: token,
+    });
+
+    if (
+      response.data.message === "Token is required!" ||
+      response.data.message === "Invalid or expired token" ||
+      response.data.message === "Server error"
+    ) {
+      console.log("Backend response:", response.data.message);
+      setIsAuth(false);
+    } else {
+      setIsAuth(response.data.isAuth);
+    }
   }
-  useEffect(()=>{
+
+  useEffect(() => {
     sendToken();
-  },[])
+  }, [isAuth]);
 
   return (
     <div>
-      <BrowserRouter>
-      <Routes>
-        <Route path="/" element={isAuthenticated?<Dashboard/>:<Signin/>} />
-        <Route  path="/signup" element={isAuthenticated?<Dashboard/>:<Signup/>}/>
-        <Route path="/signin" element={isAuthenticated?<Dashboard/>:<Signin/>}/>
-        <Route path="/dashboard" element={isAuthenticated?<Dashboard/>:<Signin/>}/>
-        <Route path="/send" element={<SendMoney/>}/>
-      </Routes>
-      </BrowserRouter>
+      <RecoilRoot>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={isAuth ? <Dashboard /> : <Signin />}
+            />
+            <Route
+              path="/signup"
+              element={isAuth ? <Dashboard /> : <Signup />}
+            />
+            <Route
+              path="/signin"
+              element={isAuth ? <Dashboard /> : <Signin />}
+            />
+            <Route
+              path="/dashboard"
+              element={isAuth?<Dashboard/>:<Signin/>}
+            />
+            <Route path="/send" element={<SendMoney />} />
+          </Routes>
+        </BrowserRouter>
+      </RecoilRoot>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

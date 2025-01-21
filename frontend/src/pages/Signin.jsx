@@ -6,11 +6,15 @@ import { ButtonWarning } from "../components/BottomWarning";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import { isAuthenticated } from "../store/atoms/isAuth";
 
-export function Signin({auth}) {
+export function Signin() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const setIsAuth=useSetRecoilState(isAuthenticated);
+
   return (
     <div className="h-screen bg-blue-200 justify-center items-center flex flex-col">
       <div className="bg-white w-[350px] h-[400px] rounded-md p-[1rem] flex flex-col items-center gap-[20px]">
@@ -50,10 +54,11 @@ export function Signin({auth}) {
                 }
               );
               if (response.data.token != null) {
-                auth=response.data.token;
+                console.log("token from BE is:",response.data.token)
                 localStorage.setItem("token", response.data.token);
-                alert("Signin Successful!");
-                navigate("/dashboard");
+                setIsAuth(true);
+                // navigate("/dashboard");
+                // alert("Signin Successful!");
               } else if (response.data.message === "Error while logging in") {
                 localStorage.clear();
                 alert("User dose not exists!");

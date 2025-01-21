@@ -11,7 +11,7 @@ export function Appbar({firstName,initialLetter}){
                 <div className="font-semibold text-[20px] p-[0.2rem] flex justify-center items-center">
                 Hello, {firstName}
                 </div>
-                <Avatar initialLetter={"S"}/>
+                <Avatar initialLetter={initialLetter}/>
             </div>
         </div>
     )
