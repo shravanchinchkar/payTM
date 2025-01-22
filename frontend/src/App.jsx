@@ -6,15 +6,16 @@ import { SendMoney } from "./pages/SendMoney";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil";
-import { isAuthenticated } from "./store/atoms/isAuth";
+import { isAuthenticated, sendMoneyAtom } from "./store/atoms/isAuth";
 import { PrivateRouter } from "./components/auth/PrivateRouter";
 
 function App() {
   const [isAuth, setIsAuth] = useRecoilState(isAuthenticated);
-  console.log("Value of isAuth is:", isAuth);
+  const sendMoneyId=useRecoilValue(sendMoneyAtom)
+  console.log("Initial log of isAuth is:",isAuth)
 
   async function sendToken() {
-    console.log("Hello sendToken");
+    console.log("Hello getToken from localstorage");
     const token = localStorage.getItem("token");
     console.log("localstorage token is:", token);
 
@@ -28,13 +29,17 @@ function App() {
       response.data.message === "Server error"
     ) {
       console.log("Backend response:", response.data.message);
-      setIsAuth(false);
-    } else {
-      setIsAuth(response.data.isAuth);
+      setIsAuth(null);
+    } else if(response.data.isAuth) {
+      console.log("LocalStorage after signin response:",localStorage.getItem("token"))
+      setIsAuth(localStorage.getItem("token"))
     }
   }
 
+  useEffect(()=>{console.log("App mounted!")},[])
+
   useEffect(() => {
+    console.log("App mounted due to isAUTH!")
     sendToken();
   }, [isAuth]);
 
@@ -46,11 +51,11 @@ function App() {
             <Route path="/" element={isAuth ? <Dashboard /> : <Signin />} />
             <Route
               path="/signup"
-              element={isAuth ? <Dashboard /> : <Signup />}
+              element={isAuth?<Dashboard/>:<Signup/>}
             />
             <Route
               path="/signin"
-              element={isAuth ? <Dashboard /> : <Signin />}
+              element={isAuth?<Dashboard/>:<Signin/>}
             />
             <Route
               path="/dashboard"
@@ -62,9 +67,7 @@ function App() {
             />
             <Route
               path="/send"
-              element={
-                <SendMoney/>
-              }
+              element={sendMoneyId!=null?<SendMoney/>:<Dashboard/>}
             />
           </Routes>
         </BrowserRouter>

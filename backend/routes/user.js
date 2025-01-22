@@ -97,7 +97,6 @@ router.post("/signup", async (req, res) => {
 //following is signin route
 router.post("/signin", async (req, res) => {
   const body = req.body; //take the login info. from the user
-  console.log("bpdy is")
   const { success } = signinSchema.safeParse(body); //validate the user input
 
   //if inputs are incorrect return the error message
@@ -127,9 +126,6 @@ router.post("/signin", async (req, res) => {
     });
     return;
   }else{
-    // return res.status(411).json({
-    //   message: "Error while logging in",
-    // });
     res.json({
       message:"Error while logging in"
     })

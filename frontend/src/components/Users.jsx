@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { Avatar } from "./Avatar";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { sendMoneyAtom } from "../store/atoms/isAuth";
 
 export function Users() {
+  const [isSendMoney,setSendMoneyAtom]=useRecoilState(sendMoneyAtom);
   const [user,setUser]=useState([]);
   const [filter,setFilter]=useState("")
   const navigate=useNavigate();
@@ -39,9 +42,12 @@ export function Users() {
           </div>
           <div>
             <button
-              type="button"
+            id={user._id}
               className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
-              onClick={()=>{
+              onClick={(e)=>{
+                console.log("SEND MONEY USER ID:",user._id)
+                setSendMoneyAtom(e.target.id);
+                console.log("Send Money id:",isSendMoney)
                 navigate(`/send?id=${user._id}&name=${user.firstName}`)
               }}
             >

@@ -3,18 +3,19 @@ import { SubHeading } from "../components/SubHeading";
 import { InputBox } from "../components/InputBox";
 import { Button } from "../components/Button";
 import { ButtonWarning } from "../components/BottomWarning";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { isAuthenticated } from "../store/atoms/isAuth";
 
 export function Signin() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const setIsAuth=useSetRecoilState(isAuthenticated);
+  const [isAuth,setIsAuth]=useRecoilState(isAuthenticated);
 
+  // useEffect(()=>{setIsAuth(localStorage.getItem("token"))},[isAuth])
   return (
     <div className="h-screen bg-blue-200 justify-center items-center flex flex-col">
       <div className="bg-white w-[350px] h-[400px] rounded-md p-[1rem] flex flex-col items-center gap-[20px]">
@@ -46,6 +47,9 @@ export function Signin() {
           <Button
             onClick={async () => {
               console.log("HELLO SIGNIN BUTTON!");
+
+              //hits the backend for the signin  route
+
               const response = await axios.post(
                 "http://localhost:3000/api/v1/user/signin",
                 {
@@ -53,19 +57,21 @@ export function Signin() {
                   password: password,
                 }
               );
+
               if (response.data.token != null) {
-                console.log("token from BE is:",response.data.token)
-                localStorage.setItem("token", response.data.token);
-                setIsAuth(true);
-                navigate("/dashboard",{
-                  
-                });
-                alert("Signin Successful!");
-                navigate("/dashboard")
+                console.log("token from BE is:",response.data.token)//display token from BE
+
+                localStorage.setItem("token",response.data.token); //set token to localStorage
+
+                setIsAuth(localStorage.getItem("token")) //set the token to isAuth State
+
+                console.log("isAuth after signin is:",isAuth)//displaying isAuth
+                // alert("Signin Successful!");
+                navigate("/dashboard");
               } else if (response.data.message === "Error while logging in") {
                 localStorage.clear();
                 alert("User dose not exists!");
-                navigate("/signin");
+                // navigate("/signin");
                 setUserName("");
                 setPassword("");
               } else if (response.data.message === "Incorrect inputs") {

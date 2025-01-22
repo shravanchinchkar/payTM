@@ -11,10 +11,10 @@ app.use(express.json());
 
 app.post("/me",(req, res) => {
   const token=req.body.token;
-  console.log("Token from localStorage",token)
-
+  console.log("Token from localStorage:",token)
 
   if(!token){
+    console.log("Token is required!");
     res.json({
       message:"Token is required!"
     })
@@ -30,6 +30,8 @@ app.post("/me",(req, res) => {
 
     const userId=decode.userId;
     try{
+      console.log("userId from the localStorage:",userId)
+
       const userExists=await User.find({
         _id:userId
       })
@@ -39,7 +41,7 @@ app.post("/me",(req, res) => {
         res.json({ isAuth: false });
         return;
       }else{
-        console.log("User authenticated!");
+        console.log("User authenticated,User present in the DB!");
         res.json({ isAuth: true });
         return;
       }
@@ -49,38 +51,6 @@ app.post("/me",(req, res) => {
       return;
     }
   })
-
-  // const response=jwt.verify(token,JWT_SECRET,(err,decoded)=>{
-  //   if(err){
-  //     console.error('JWT Error:', err);
-  //     res.status(401).json({ message: 'Invalid or expired token', error: err.message });
-  //     return;
-  //   }
-  //   req.user = decoded;
-  //   return
-  // });
-  // console.log("Verification is:",response)
-
-
-  // const userExists=await User.find({
-  //   _id:response.userId
-  // })
-
-  // console.log("Existing user:",userExists)
-
-  // if(!userExists){
-  //   console.log("hello false!")
-  //   res.json({
-  //     isAuth:false
-  //   })
-  //   return;
-  // }else{
-  //   console.log("hello true!")
-  //   res.json({
-  //     isAuth:true
-  //   })
-  //   return;
-  // }
 });
 
 app.use("/api/v1/", mainRouter);

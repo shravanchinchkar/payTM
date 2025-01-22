@@ -1,47 +1,107 @@
+import { useEffect, useState, memo } from "react";
+import { Appbar } from "../components/Appbar";
+import { Balance } from "../components/Balance";
+import { Users } from "../components/Users";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { isAuthenticated } from "../store/atoms/isAuth";
 
-import { useEffect, useState } from "react"
-import { Appbar } from "../components/Appbar"
-import { Balance } from "../components/Balance"
-import { Users } from "../components/Users"
-import axios from "axios"
+export const Dashboard = memo(() => {
+  const [loginuser, setLoginUser] = useState([]);
+  const [balance, setBalance] = useState(0);
+  const navigate=useNavigate()
 
-export function Dashboard(){
-    const [loginuser,setLoginUser]=useState([])
-    const [balance,setBalance]=useState(0);
-
-    async function getData(){
-       const response=await axios.get("http://localhost:3000/api/v1/user/loginuser",{
-            headers:{
-                Authorization:`Bearer ${localStorage.getItem("token")}`
-            }
-        })
-        console.log("response is:",response.data.user.firstName)
-        console.log("Balance is:",response.data.balance);
-        setLoginUser(response.data.user)
-        setBalance(response.data.balance.balance);
+  async function getData() {
+    const isAuth=useRecoilValue(isAuthenticated)
+    console.log("getData() from the Dashboard Component");
+    const response = await axios.get(
+      "http://localhost:3000/api/v1/user/loginuser",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    if(response.data.message=="Something went wrong"){
+        console.log("Helllo negative response")
+        navigate("/signin")
+        console.log("isAuth in Dashboard after logout:",isAuth)
+        return;
     }
-    useEffect(()=>{
-        console.log("Dashboard Mounted")
-        getData();
-    },[])
+    console.log("Respons from  BE in Dashboard is:",response)
+    console.log("response is:", response.data.user.firstName);
+    console.log("Balance is:", response.data.balance);
+    setLoginUser(response.data.user);
+    setBalance(response.data.balance.balance);
+  }
 
-    let firstName;
-    let firstLetter;
-    if(loginuser.firstName===undefined){
-        firstName="User"
-        firstLetter="U"
-    }
-    else{
-        firstName=loginuser.firstName[0].toUpperCase() + loginuser.firstName.slice(1);
-        firstLetter=loginuser.firstName[0].toUpperCase();
-    }
+  useEffect(() => {
+    console.log("Dashboard Mounted");
+    getData();
+  }, []);
 
-    return (
-        <div className="overflow-hidden">
-            <Appbar firstName={firstName} initialLetter={firstLetter}/>
-            <Balance amount={balance.toFixed(2)}/>
-            <Users/>
-        </div>
-    )
-    
-}
+  let firstName;
+  let firstLetter;
+  if (loginuser.firstName === undefined) {
+    firstName = "User";
+    firstLetter = "U";
+  } else {
+    firstName =
+      loginuser.firstName[0].toUpperCase() + loginuser.firstName.slice(1);
+    firstLetter = loginuser.firstName[0].toUpperCase();
+  }
+
+  return (
+    <div className="overflow-hidden">
+      <Appbar firstName={firstName} initialLetter={firstLetter} />
+      <Balance amount={balance.toFixed(2)} />
+      <Users />
+    </div>
+  );
+});
+
+// export function Dashboard() {
+//   const [loginuser, setLoginUser] = useState([]);
+//   const [balance, setBalance] = useState(0);
+
+//   async function getData() {
+//     console.log("getData() from the Dashboard Component");
+//     const response = await axios.get(
+//       "http://localhost:3000/api/v1/user/loginuser",
+//       {
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem("token")}`,
+//         },
+//       }
+//     );
+//     console.log("response is:", response.data.user.firstName);
+//     console.log("Balance is:", response.data.balance);
+//     setLoginUser(response.data.user);
+//     setBalance(response.data.balance.balance);
+//   }
+
+//   useEffect(() => {
+//     console.log("Dashboard Mounted");
+//     getData();
+//   }, []);
+
+//   let firstName;
+//   let firstLetter;
+//   if (loginuser.firstName === undefined) {
+//     firstName = "User";
+//     firstLetter = "U";
+//   } else {
+//     firstName =
+//       loginuser.firstName[0].toUpperCase() + loginuser.firstName.slice(1);
+//     firstLetter = loginuser.firstName[0].toUpperCase();
+//   }
+
+//   return (
+//     <div className="overflow-hidden">
+//       <Appbar firstName={firstName} initialLetter={firstLetter} />
+//       <Balance amount={balance.toFixed(2)} />
+//       <Users />
+//     </div>
+//   );
+// }

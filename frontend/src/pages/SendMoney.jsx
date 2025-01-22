@@ -1,6 +1,6 @@
 import { Avatar } from "../components/Avatar";
 import { Heading } from "../components/Heading";
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from "axios";
 import { useState } from "react";
 
@@ -9,6 +9,8 @@ export function SendMoney() {
   const [amount,setAmount]=useState(0);
   const id=searchParams.get("id");
   const name=searchParams.get("name");
+  const navigate=useNavigate();
+
 
   return (
     <div className="h-screen bg-blue-200 justify-center items-center flex flex-col">
@@ -32,8 +34,8 @@ export function SendMoney() {
                 <input type="number" onChange={(e)=>{setAmount(e.target.value)}} placeholder="Enter amount" className="border-[2px] rounded-md p-[0.2rem] w-[380px] outline-none" />
             </div>
             <div>
-            <button type="button" className="w-[380px] text-white bg-orange-500 hover:bg-orange-700   font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 " onClick={()=>{
-              axios.post("http://localhost:3000/api/v1/account/transfer",{
+            <button type="button" className="w-[380px] text-white bg-orange-500 hover:bg-orange-700   font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 " onClick={async()=>{
+             const response=await axios.post("http://localhost:3000/api/v1/account/transfer",{
                 to:id,
                 amount:amount
               },{
@@ -41,6 +43,10 @@ export function SendMoney() {
                   Authorization:`Bearer ${localStorage.getItem("token")}`
                 }
               })
+              if(response.data.message="Transaction Successful!"){
+                alert("Transaction Successfull!")
+                navigate("/dashboard")
+              }
             }}>Initiate Transfer</button>
             </div>
         </div>

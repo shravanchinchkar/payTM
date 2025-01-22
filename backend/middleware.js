@@ -6,9 +6,11 @@ function authMiddleware(req, res, next) {
 
   //if authHeader is invalid return a error message
   if (!authHeader || !authHeader.startsWith("Bearer")) {
-    return res.status(403).json({
+    res.status(403).json({
       message: "Invalid input!",
     });
+    return;
+    
   }
 
   //if token is valid execute the following code
@@ -24,9 +26,13 @@ function authMiddleware(req, res, next) {
       return res.status(403).json({});
     }
   } catch (err) {
-    return res.status(403).json({
+    // res.status(403).json({
+    //   message: "Something went wrong",
+    // });
+    res.json({
       message: "Something went wrong",
     });
+    return;
   }
 }
 
