@@ -96,6 +96,7 @@ router.post("/signup", async (req, res) => {
 
 //following is signin route
 router.post("/signin", async (req, res) => {
+  console.log("in /signin route");
   const body = req.body; //take the login info. from the user
   const { success } = signinSchema.safeParse(body); //validate the user input
 
@@ -104,7 +105,7 @@ router.post("/signin", async (req, res) => {
     res.json({
       message: "Incorrect inputs",
     });
-    return
+    return;
   }
 
   //if correct check whether the user exists in the db
@@ -115,23 +116,27 @@ router.post("/signin", async (req, res) => {
 
   //if user exists then
   if (user) {
+    // console.log("user exists")
+    // console.log("existing user:",user)
+    // console.log("user Id of existing user:",user._id)
+
     const token = jwt.sign(
       {
         userId: user._id,
       },
       JWT_SECRET
     );
+    console.log("hot token:", token);
     res.json({
       token: token,
     });
     return;
-  }else{
+  } else {
     res.json({
-      message:"Error while logging in"
-    })
+      message: "Error while logging in",
+    });
     return;
   }
-  
 });
 
 //following is the route to update firstName,lastName and password
@@ -156,25 +161,40 @@ router.put("/", authMiddleware, async (req, res) => {
 });
 
 //gets the users from backend
-router.get("/bulk", async (req, res) => {
-  const filter =req.query.filter || "";
-  const finalFilter=filter.charAt(0).toUpperCase() +filter.slice(1)
+router.get("/bulk", authMiddleware, async (req, res) => {
+  const filter = req.query.filter || "";
+  const finalFilter = filter.charAt(0).toUpperCase() + filter.slice(1);
+  const userId = req.userId;
 
-  //folllowing code says that if the substring present in the filter variable matches with either firstname or lastname return the user
+  console.log("Final Filter:", finalFilter);
+
+  //folllowing code says that if the substring present in the filter variable matches with either firstname or lastname return the user and also check that the logined user information is not returned
+  
   const filterUsers = await User.find({
-    $or: [
+    $and: [
+      // Use $and to combine the $or with the exclusion
       {
-        firstName: {
-          $regex: finalFilter,
-        },
+        $or: [
+          {
+            firstName: {
+              $regex: finalFilter,
+              $options: "i", // Add case-insensitive matching if needed
+            },
+          },
+          {
+            lastName: {
+              $regex: finalFilter,
+              $options: "i", // Add case-insensitive matching if needed
+            },
+          },
+        ],
       },
       {
-        lastName: {
-          $regex: finalFilter,
-        },
+        _id: { $ne: userId }, // Exclude the current user. Assuming userId is the _id
       },
     ],
   });
+
   res.json({
     user: filterUsers.map((user) => ({
       username: user.username,
@@ -185,20 +205,21 @@ router.get("/bulk", async (req, res) => {
   });
 });
 
-router.get("/loginuser",authMiddleware,async(req,res)=>{
-  const userId=req.userId;
-  const requiredUser=await User.findOne({
-    _id:userId
-  })
-  const requireBalance=await Account.findOne({
-    userId:userId
-  })
-  
+router.get("/loginuser", authMiddleware, async (req, res) => {
+  console.log("in /loginuser");
+  const userId = req.userId;
+  const requiredUser = await User.findOne({
+    _id: userId,
+  });
+  const requireBalance = await Account.findOne({
+    userId: userId,
+  });
+
   res.json({
-    user:requiredUser,
-    balance:requireBalance
-  })
+    user: requiredUser,
+    balance: requireBalance,
+  });
   return;
-})
+});
 
 module.exports = router;

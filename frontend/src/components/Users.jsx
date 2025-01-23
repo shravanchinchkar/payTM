@@ -14,11 +14,17 @@ export function Users() {
 
   //need to add debouncing
   useEffect(()=>{
-    axios.get(`http://localhost:3000/api/v1/user/bulk?filter=${filter}`)
+    axios.get(`http://localhost:3000/api/v1/user/bulk?filter=${filter}`,{
+      headers:{
+        Authorization:`Bearer ${localStorage.getItem("token")}`
+      }
+    })
     .then((response)=>{
       setUser(response.data.user)
     })
   },[filter])
+  
+  console.log("all the users from BE:",user)
 
   return (
     <div className="m-[1rem] flex flex-col gap-[1rem]">
