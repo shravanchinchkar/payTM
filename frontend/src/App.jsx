@@ -1,4 +1,10 @@
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 import { Signup } from "./pages/Signup";
 import { Signin } from "./pages/Signin";
 import { Dashboard } from "./pages/Dashboard";
@@ -11,8 +17,8 @@ import { PrivateRouter } from "./components/auth/PrivateRouter";
 
 function App() {
   const [isAuth, setIsAuth] = useRecoilState(isAuthenticated);
-  const sendMoneyId=useRecoilValue(sendMoneyAtom)
-  console.log("Initial log of isAuth is:",isAuth)
+  const sendMoneyId = useRecoilValue(sendMoneyAtom);
+  console.log("Initial log of isAuth is:", isAuth);
 
   async function sendToken() {
     console.log("Hello getToken from localstorage");
@@ -30,16 +36,21 @@ function App() {
     ) {
       console.log("Backend response:", response.data.message);
       setIsAuth(null);
-    } else if(response.data.isAuth) {
-      console.log("LocalStorage after signin response:",localStorage.getItem("token"))
-      setIsAuth(localStorage.getItem("token"))
+    } else if (response.data.isAuth) {
+      console.log(
+        "LocalStorage after signin response:",
+        localStorage.getItem("token")
+      );
+      setIsAuth(localStorage.getItem("token"));
     }
   }
 
-  useEffect(()=>{console.log("App mounted!")},[])
+  useEffect(() => {
+    console.log("App mounted!");
+  }, []);
 
   useEffect(() => {
-    console.log("App mounted due to isAUTH!")
+    console.log("App mounted due to isAUTH!");
     sendToken();
   }, [isAuth]);
 
@@ -51,11 +62,15 @@ function App() {
             <Route path="/" element={isAuth ? <Dashboard /> : <Signin />} />
             <Route
               path="/signup"
-              element={isAuth?<Dashboard/>:<Signup/>}
+              element={<Signup/>}
             />
             <Route
               path="/signin"
-              element={isAuth?<Dashboard/>:<Signin/>}
+              element={
+                <PrivateRouter>
+                  <Signin />
+                </PrivateRouter>
+              }
             />
             <Route
               path="/dashboard"
@@ -67,7 +82,11 @@ function App() {
             />
             <Route
               path="/send"
-              element={sendMoneyId!=null?<SendMoney/>:<Dashboard/>}
+              element={
+                <PrivateRouter>
+                    <SendMoney/>
+                </PrivateRouter>
+              }
             />
           </Routes>
         </BrowserRouter>

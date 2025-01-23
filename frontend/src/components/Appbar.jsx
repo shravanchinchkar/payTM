@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Navigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { isAuthenticated } from "../store/atoms/isAuth";
 
@@ -9,25 +9,30 @@ export function Appbar({ firstName, initialLetter }) {
   const navigate = useNavigate();
 
   function logOut(){
-    console.log("In logOut button!")
-    localStorage.setItem("token","");
-    console.log("localStorage after logout:",localStorage.getItem("token"))
-    setIsAuth(localStorage.getItem("token"))
-    console.log("Value of isAuth after logout:",isAuth)
-    navigate("/signin")
+    console.log("In logOut button!") //log
+    localStorage.removeItem("token")
+    console.log("localStorage after logout:",localStorage.getItem("token")) //log
+    const tokenValue=localStorage.getItem("token");
+    console.log("Token value in Appbar:",tokenValue)
+    
+    setIsAuth(tokenValue)
+    console.log("Value of isAuth after logout:",isAuth)//log
     setDisplayLogout(false);
+    navigate("/signin")
   }
-  useEffect(()=>{
-    console.log("useEffect due to isAuth")
-    setIsAuth(localStorage.getItem("token"))
-  },[isAuth])
+
+  // useEffect(()=>{
+  //   console.log("useEffect due to isAuth")
+  //   const tokenValue=localStorage.getItem("token");
+  //   setIsAuth(tokenValue)
+  // },[isAuth])
 
 
   return (
     <div className="w-screen bg-white flex justify-between p-[1rem] border-b-[2px] items-center">
       <div className="font-bold text-[30px]">Payments App</div>
 
-      <div className="flex gap-[10px] mr-[1rem] relative">
+      <div className="flex gap-[10px] mr-[1rem]  relative">
         {/* Following is the greeting div */}
         <div className="font-semibold text-[20px] p-[0.2rem] flex justify-center items-center">
           Hello, {firstName}

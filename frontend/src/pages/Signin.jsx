@@ -10,12 +10,11 @@ import { useRecoilState } from "recoil";
 import { isAuthenticated } from "../store/atoms/isAuth";
 
 export function Signin() {
+  const [isAuth,setIsAuth]=useRecoilState(isAuthenticated);
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const [isAuth,setIsAuth]=useRecoilState(isAuthenticated);
 
-  // useEffect(()=>{setIsAuth(localStorage.getItem("token"))},[isAuth])
   return (
     <div className="h-screen bg-blue-200 justify-center items-center flex flex-col">
       <div className="bg-white w-[350px] h-[400px] rounded-md p-[1rem] flex flex-col items-center gap-[20px]">
