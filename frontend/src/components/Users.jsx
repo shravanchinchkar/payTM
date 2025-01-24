@@ -9,12 +9,30 @@ export function Users() {
   const [isSendMoney,setSendMoneyAtom]=useRecoilState(sendMoneyAtom);
   const [user,setUser]=useState([]);
   const [filter,setFilter]=useState("")
+  const debounced=useDebouncing(filter,500)
   const navigate=useNavigate();
 
+  //following is the custom hook return for debouncing
 
-  //need to add debouncing
+
+  function useDebouncing(filter,timeout){
+    const [debounced,setDebounced]=useState(filter);
+    useEffect(()=>{
+      let timeOutValue=setTimeout(()=>{
+        setDebounced(filter);
+      },timeout)
+
+      return (()=>{
+        console.log("Clearning timeout")
+        clearTimeout(timeOutValue)
+      })
+    },[filter])
+
+    return debounced;
+  }
+
   useEffect(()=>{
-    axios.get(`http://localhost:3000/api/v1/user/bulk?filter=${filter}`,{
+    axios.get(`http://localhost:3000/api/v1/user/bulk?filter=${debounced}`,{
       headers:{
         Authorization:`Bearer ${localStorage.getItem("token")}`
       }
@@ -22,9 +40,9 @@ export function Users() {
     .then((response)=>{
       setUser(response.data.user)
     })
-  },[filter])
+  },[debounced])
   
-  console.log("all the users from BE:",user)
+  // console.log("all the users from BE:",user)
 
   return (
     <div className="m-[1rem] flex flex-col gap-[1rem]">
